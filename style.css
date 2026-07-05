@@ -1,16 +1,17 @@
+/* Estilos limpios y modernos */
 :root {
-  --primary-brown: #92400e;
-  --accent-orange: #fb923c;
+  --brown: #92400e;
+  --orange: #fb923c;
   --gold: #fcd34d;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-  min-height: 100vh;
   font-family: 'Rajdhani', system-ui, sans-serif;
   background: linear-gradient(180deg, #4ade80 0%, #fb923c 100%);
   color: #451a03;
+  min-height: 100vh;
 }
 
 .app {
@@ -19,115 +20,119 @@ body {
   padding: 1.5rem;
 }
 
-.header { text-align: center; margin-bottom: 1.5rem; }
+.header {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
 
 .logo {
   font-family: 'Orbitron', sans-serif;
-  font-size: 2.6rem;
+  font-size: 2.8rem;
   font-weight: 900;
-  background: linear-gradient(135deg, #92400e, #fb923c, #ec4899);
+  background: linear-gradient(135deg, #92400e, #fb923c);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
 .screen {
   display: none;
-  width: 100%;
 }
 
-.screen--active {
+.screen.active {
   display: block;
 }
 
 .panel {
   background: white;
-  border: 4px solid var(--primary-brown);
+  border: 4px solid var(--brown);
   border-radius: 16px;
   padding: 2rem;
+  max-width: 420px;
+  margin: 0 auto;
   box-shadow: 0 10px 30px rgba(0,0,0,0.2);
 }
 
-.menu-panel { max-width: 420px; margin: 0 auto; }
-
-.player-selector { display: flex; gap: 0.5rem; margin: 1rem 0; }
+.player-selector {
+  display: flex;
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
 
 .btn {
   font-weight: 700;
   border: none;
   border-radius: 10px;
+  padding: 0.75rem 1.5rem;
   cursor: pointer;
-  padding: 0.7rem 1.4rem;
   font-size: 1.05rem;
 }
 
-.btn--ghost {
+.btn-ghost {
   background: #fefce8;
   color: #451a03;
-  border: 2px solid var(--primary-brown);
+  border: 2px solid var(--brown);
 }
 
-.btn--ghost.btn--selected {
-  background: var(--accent-orange);
+.btn-ghost.selected {
+  background: var(--orange);
   color: white;
-  border-color: var(--primary-brown);
+  border-color: var(--brown);
 }
 
-.btn--primary {
-  background: var(--primary-brown);
+.btn-primary {
+  background: var(--brown);
   color: white;
   width: 100%;
   margin-top: 1rem;
 }
 
-/* Loading Screen */
+/* Loading */
 #loading-screen {
-  position: relative;
-  min-height: 520px;
-  background: #111827;
-  border-radius: 16px;
+  min-height: 500px;
   display: flex;
   align-items: center;
   justify-content: center;
+  background: #1f2937;
+  border-radius: 16px;
 }
 
-.loading-overlay {
+.loading-box {
   text-align: center;
 }
 
-.loading-spinner {
-  width: 64px;
-  height: 64px;
+.spinner {
+  width: 60px;
+  height: 60px;
   border: 6px solid #374151;
   border-top-color: #f59e0b;
   border-radius: 50%;
   animation: spin 1s linear infinite;
-  margin: 0 auto 1.2rem;
+  margin: 0 auto 1rem;
 }
 
 @keyframes spin { to { transform: rotate(360deg); } }
 
-.loading-text {
+.loading-box p {
   color: #fcd34d;
-  font-size: 1.5rem;
+  font-size: 1.4rem;
   font-weight: 700;
 }
 
-/* Game Layout */
-.game-layout {
+/* Game */
+.game-wrapper {
   display: flex;
   flex-direction: column;
   gap: 1rem;
 }
 
-.game-main {
+.game-content {
   display: flex;
   gap: 1.5rem;
-  align-items: flex-start;
 }
 
-.canvas-wrap {
+.canvas-container {
   background: #fefce8;
-  border: 6px solid var(--primary-brown);
+  border: 6px solid var(--brown);
   border-radius: 16px;
   padding: 10px;
   box-shadow: 0 15px 35px rgba(0,0,0,0.3);
@@ -136,12 +141,13 @@ body {
 .side-panel {
   width: 210px;
   background: white;
-  border: 4px solid var(--primary-brown);
+  border: 4px solid var(--brown);
   border-radius: 16px;
   padding: 1.2rem;
+  flex-shrink: 0;
 }
 
-.timer {
+.timer-value {
   font-family: 'Orbitron', sans-serif;
   font-size: 2.8rem;
   font-weight: 900;
@@ -149,21 +155,11 @@ body {
   text-align: center;
 }
 
-.current-turn {
-  background: #fb923c;
-  color: white;
-  padding: 0.6rem 1rem;
-  border-radius: 10px;
-  font-weight: 800;
+.turn-container, .piece-container {
+  margin-top: 1rem;
   text-align: center;
-  margin: 1rem 0;
 }
 
-.result-panel { text-align: center; max-width: 420px; margin: 0 auto; }
-
-.footer {
+.result-panel {
   text-align: center;
-  margin-top: 2rem;
-  color: #78350f;
-  font-size: 0.9rem;
 }
