@@ -3,7 +3,7 @@
 
   const CONFIG = {
     rows: 7, cols: 13, blockSize: 48, maxLives: 3, turnTime: 25,
-    gravity: 420, instabilityChance: 0.35,
+    gravity: 420,
     players: [
       { id: 1, name: 'Jugador 1', color: '#f97316', keys: { left: 'ArrowLeft', right: 'ArrowRight', action: 'Space' } },
       { id: 2, name: 'Jugador 2', color: '#22c55e', keys: { left: 'KeyA', right: 'KeyD', action: 'KeyF' } },
@@ -46,7 +46,7 @@
       div.className = `hud-player ${!p.alive ? 'out' : ''}`;
       let hearts = '';
       for (let j = 0; j < CONFIG.maxLives; j++) hearts += `<div class="life ${j >= p.lives ? 'lost' : ''}"></div>`;
-      div.innerHTML = `<span class="dot" style="background:${p.color}"></span> <strong>${p.name}</strong> <div class="lives">${hearts}</div>`;
+      div.innerHTML = `<span class="dot" style="background:${p.color}"></span> <strong>${p.name}</strong>`;
       if (i === currentPlayerIndex && p.alive) div.style.boxShadow = `0 0 0 4px ${p.color}`;
       hudEl.appendChild(div);
     });
@@ -90,18 +90,18 @@
     for (let r = CONFIG.rows - 2; r >= 0; r--) {
       for (let c = 0; c < CONFIG.cols; c++) {
         if (grid[r][c] && grid[r][c].state === 'solid' && !getBlock(r + 1, c)) {
-          fallingBlocks.push({ x: 55 + c * CONFIG.blockSize, y: 145 + r * 42, vy: 85, life: 1.0, color: '#854d0e' });
+          fallingBlocks.push({ x: 55 + c * CONFIG.blockSize, y: 145 + r * 42, vy: 80, life: 0.95, color: '#854d0e' });
           grid[r][c] = null;
         }
       }
     }
-    screenShake = 9;
+    screenShake = 8;
   }
 
   function updateFalling(dt) {
     fallingBlocks = fallingBlocks.filter(b => {
       b.y += b.vy * dt; b.vy += CONFIG.gravity * dt; b.life -= dt;
-      if (b.y > 520 || b.life <= 0) { spawnParticles(b.x + 18, b.y + 12, b.color, 5); return false; }
+      if (b.y > 520 || b.life <= 0) { spawnParticles(b.x + 18, b.y + 10, b.color, 5); return false; }
       return true;
     });
   }
@@ -111,7 +111,7 @@
       if (!p.alive) return;
       if (!getBlock(p.row, p.col)) {
         p.lives--;
-        spawnParticles(55 + p.col * CONFIG.blockSize + 24, 145 + p.row * 42 + 18, p.color, 12);
+        spawnParticles(55 + p.col * CONFIG.blockSize + 24, 145 + p.row * 42 + 16, p.color, 10);
         if (p.lives <= 0) { p.alive = false; checkWin(); }
       }
     });
@@ -127,30 +127,30 @@
         const w = alive[0];
         document.getElementById('result-title').textContent = w ? '¡Victoria!' : 'Fin';
         document.getElementById('result-message').textContent = w ? `${w.name} es el último en pie.` : 'Todos cayeron.';
-      }, 900);
+      }, 800);
     }
   }
 
   function updateArm() {
     if (!running) return;
-    armAngle += armDirection * 0.026;
-    if (armAngle > 0.82) armDirection = -1;
-    if (armAngle < -0.82) armDirection = 1;
+    armAngle += armDirection * 0.025;
+    if (armAngle > 0.8) armDirection = -1;
+    if (armAngle < -0.8) armDirection = 1;
   }
 
   function dropPiece() {
     if (!running) return;
     const p = getCurrentPlayer(); if (!p.alive) return;
-    const dropX = 140 + Math.sin(armAngle) * 210;
-    const col = Math.max(0, Math.min(CONFIG.cols-1, Math.floor((dropX - 55) / CONFIG.blockSize)));
+    const dropX = 140 + Math.sin(armAngle) * 205;
+    const col = Math.max(0, Math.min(CONFIG.cols-1, Math.floor((dropX-55)/CONFIG.blockSize)));
 
     for (let r = CONFIG.rows-1; r >= 0; r--) {
       if (grid[r][col] && grid[r][col].state === 'solid') {
         grid[r][col].height = (grid[r][col].height || 0) + 1;
-        spawnParticles(dropX, 145 + r * 42 + 12, p.color, 9);
-        if (Math.random() < 0.45) makeBlocksFall();
-        screenShake = 7;
-        setTimeout(() => { if (running) { makeBlocksFall(); checkPlayerFall(); updateHUD(); nextTurn(); } }, 380);
+        spawnParticles(dropX, 145 + r * 42 + 10, p.color, 8);
+        if (Math.random() < 0.4) makeBlocksFall();
+        screenShake = 6;
+        setTimeout(() => { if (running) { makeBlocksFall(); checkPlayerFall(); updateHUD(); nextTurn(); } }, 350);
         return;
       }
     }
@@ -170,24 +170,22 @@
   }
 
   function spawnParticles(x, y, color, count) {
-    for (let i = 0; i < count; i++) particles.push({ x, y, vx: (Math.random()-0.5)*150, vy: (Math.random()-0.5)*120-25, life: 0.5 + Math.random()*0.4, color, size: 3 + Math.random()*3 });
+    for (let i = 0; i < count; i++) particles.push({ x, y, vx: (Math.random()-0.5)*140, vy: (Math.random()-0.5)*110-20, life: 0.48 + Math.random()*0.35, color, size: 3 + Math.random()*2.5 });
   }
 
   function updateParticles(dt) {
-    particles = particles.filter(p => { p.life -= dt; p.x += p.vx * dt; p.y += p.vy * dt; p.vy += 340 * dt; return p.life > 0; });
+    particles = particles.filter(p => { p.life -= dt; p.x += p.vx*dt; p.y += p.vy*dt; p.vy += 320*dt; return p.life > 0; });
   }
 
   function draw() {
     ctx.save();
-    if (screenShake > 0) { ctx.translate((Math.random()-0.5) * screenShake, (Math.random()-0.5) * screenShake); screenShake *= 0.82; }
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    if (screenShake > 0) { ctx.translate((Math.random()-0.5)*screenShake, (Math.random()-0.5)*screenShake); screenShake *= 0.8; }
+    ctx.clearRect(0,0,canvas.width,canvas.height);
 
-    // Fondo
     const g = ctx.createLinearGradient(0,0,0,canvas.height);
-    g.addColorStop(0,'#1e2937'); g.addColorStop(0.28,'#334155'); g.addColorStop(0.58,'#854d0e'); g.addColorStop(1,'#f59e0b');
+    g.addColorStop(0,'#1e2937'); g.addColorStop(0.3,'#334155'); g.addColorStop(0.6,'#854d0e'); g.addColorStop(1,'#f59e0b');
     ctx.fillStyle = g; ctx.fillRect(0,0,canvas.width,canvas.height);
 
-    // Pirámide
     const bs = CONFIG.blockSize;
     for (let r = 0; r < CONFIG.rows; r++) {
       const w = 2 * r + 1; const start = Math.floor((CONFIG.cols - w) / 2);
@@ -200,30 +198,25 @@
       }
     }
 
-    // Brazo
     ctx.save(); ctx.translate(135, 155); ctx.rotate(armAngle);
-    ctx.strokeStyle = '#451a03'; ctx.lineWidth = 13; ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(0,205); ctx.stroke();
-    ctx.strokeStyle = '#fcd34d'; ctx.lineWidth = 6;
-    for (let i = 1; i < 5; i++) { const yy = 205/5 * i; ctx.beginPath(); ctx.moveTo(-4,yy); ctx.lineTo(4,yy); ctx.stroke(); }
-    ctx.strokeStyle = '#f59e0b'; ctx.lineWidth = 5; ctx.beginPath(); ctx.moveTo(-16,200); ctx.lineTo(0,228); ctx.lineTo(16,200); ctx.stroke();
-    ctx.fillStyle = '#f97316'; ctx.beginPath(); ctx.arc(0,231,9,0,Math.PI*2); ctx.fill();
+    ctx.strokeStyle = '#451a03'; ctx.lineWidth = 12; ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(0,200); ctx.stroke();
+    ctx.strokeStyle = '#fcd34d'; ctx.lineWidth = 5.5;
+    for (let i = 1; i < 5; i++) { const yy = 200/5 * i; ctx.beginPath(); ctx.moveTo(-3.5,yy); ctx.lineTo(3.5,yy); ctx.stroke(); }
+    ctx.strokeStyle = '#f59e0b'; ctx.lineWidth = 4.5; ctx.beginPath(); ctx.moveTo(-14,195); ctx.lineTo(0,222); ctx.lineTo(14,195); ctx.stroke();
+    ctx.fillStyle = '#f97316'; ctx.beginPath(); ctx.arc(0,225,8,0,Math.PI*2); ctx.fill();
     ctx.restore();
 
-    // Jugadores (círculos de color)
     players.forEach(p => {
       if (!p.alive) return;
       const x = 55 + p.col * bs + 24;
-      const y = 145 + p.row * 42 - 5;
-      ctx.fillStyle = p.color; ctx.beginPath(); ctx.arc(x, y, 12, 0, Math.PI*2); ctx.fill();
+      const y = 145 + p.row * 42 - 4;
+      ctx.fillStyle = p.color; ctx.beginPath(); ctx.arc(x, y, 11, 0, Math.PI*2); ctx.fill();
       ctx.strokeStyle = '#451a03'; ctx.lineWidth = 2; ctx.stroke();
     });
 
-    // Partículas
     particles.forEach(p => { ctx.globalAlpha = p.life; ctx.fillStyle = p.color; ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI*2); ctx.fill(); });
     ctx.globalAlpha = 1;
-
-    // Bloques cayendo
-    fallingBlocks.forEach(b => { ctx.fillStyle = b.color; ctx.fillRect(b.x, b.y, 34, 30); });
+    fallingBlocks.forEach(b => { ctx.fillStyle = b.color; ctx.fillRect(b.x, b.y, 32, 28); });
 
     ctx.restore();
   }
@@ -246,17 +239,12 @@
   function startCountdown() {
     let count = 3;
     const iv = setInterval(() => {
-      ctx.fillStyle = 'rgba(17,24,39,0.92)'; ctx.fillRect(0,0,canvas.width,canvas.height);
-      ctx.fillStyle = '#fcd34d'; ctx.font = 'bold 130px Orbitron'; ctx.textAlign = 'center';
-      if (count > 0) {
-        ctx.fillText(count, canvas.width/2, canvas.height/2 + 45);
-      } else {
-        clearInterval(iv);
-        ctx.fillText('START', canvas.width/2, canvas.height/2 + 45);
-        setTimeout(() => { startTurnTimer(); gameLoop(); }, 650);
-      }
+      ctx.fillStyle = 'rgba(17,24,39,0.9)'; ctx.fillRect(0,0,canvas.width,canvas.height);
+      ctx.fillStyle = '#fcd34d'; ctx.font = 'bold 120px Orbitron'; ctx.textAlign = 'center';
+      if (count > 0) ctx.fillText(count, canvas.width/2, canvas.height/2 + 40);
+      else { clearInterval(iv); ctx.fillText('START', canvas.width/2, canvas.height/2 + 40); setTimeout(() => { startTurnTimer(); gameLoop(); }, 600); }
       count--;
-    }, 780);
+    }, 750);
   }
 
   function startGame() {
@@ -274,7 +262,7 @@
       if (timerEl) timerEl.textContent = turnTimeLeft;
       startCountdown();
       running = true;
-    }, 1500);
+    }, 1400);
   }
 
   function restartGame() {
@@ -282,7 +270,6 @@
     showScreen('menu'); running = false;
   }
 
-  // Eventos
   document.querySelectorAll('.player-selector button').forEach(btn => {
     btn.addEventListener('click', () => {
       document.querySelectorAll('.player-selector button').forEach(b => b.classList.remove('selected'));
@@ -296,14 +283,16 @@
   window.addEventListener('keydown', e => {
     if (!running) return;
     const p = getCurrentPlayer(); if (!p || !p.alive) return;
-    if (e.code === p.keys.left) armAngle -= 0.13;
-    if (e.code === p.keys.right) armAngle += 0.13;
+    if (e.code === p.keys.left) armAngle -= 0.12;
+    if (e.code === p.keys.right) armAngle += 0.12;
     if (e.code === p.keys.action || e.code === 'Space') { e.preventDefault(); dropPiece(); }
   });
 
   function init() {
     canvas.width = 860; canvas.height = 620;
-    console.log('%c[Prickly Pyramids] Bugs arreglados. Loading full-screen + flujo limpio.', 'color:#f59e0b');
+    // Aseguramos que el menú esté visible al cargar
+    showScreen('menu');
+    console.log('%c[Prickly Pyramids] Menú visible. Listo para jugar.', 'color:#f59e0b');
   }
 
   init();
