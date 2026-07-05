@@ -1,28 +1,23 @@
-(function () {
+(function() {
   'use strict';
 
   const CONFIG = {
-    rows: 7,
-    cols: 13,
-    blockSize: 48,
-    maxLives: 3,
-    turnTime: 25,
-    gravity: 420,
-    instabilityChance: 0.35,
+    rows: 7, cols: 13, blockSize: 48, maxLives: 3, turnTime: 25,
+    gravity: 420, instabilityChance: 0.35,
     players: [
       { id: 1, name: 'Jugador 1', color: '#f97316', keys: { left: 'ArrowLeft', right: 'ArrowRight', action: 'Space' } },
       { id: 2, name: 'Jugador 2', color: '#22c55e', keys: { left: 'KeyA', right: 'KeyD', action: 'KeyF' } },
       { id: 3, name: 'Jugador 3', color: '#3b82f6', keys: { left: 'KeyJ', right: 'KeyL', action: 'KeyK' } },
-      { id: 4, name: 'Jugador 4', color: '#a855f7', keys: { left: 'KeyU', right: 'KeyO', action: 'KeyI' } },
+      { id: 4, name: 'Jugador 4', color: '#a855f7', keys: { left: 'KeyU', right: 'KeyO', action: 'KeyI' } }
     ],
-    pieceTypes: ['I', 'T', 'L', 'O', 'S']
+    pieceTypes: ['I','T','L','O','S']
   };
 
   const screens = {
     menu: document.getElementById('menu-screen'),
     loading: document.getElementById('loading-screen'),
     game: document.getElementById('game-screen'),
-    result: document.getElementById('result-screen'),
+    result: document.getElementById('result-screen')
   };
 
   const canvas = document.getElementById('game-canvas');
@@ -32,61 +27,38 @@
   const currentTurnEl = document.getElementById('current-turn');
   const currentPieceEl = document.getElementById('current-piece');
 
-  let grid = [];
-  let players = [];
-  let particles = [];
-  let fallingBlocks = [];
-  let running = false;
-  let currentPlayerIndex = 0;
-  let turnTimeLeft = CONFIG.turnTime;
-  let turnTimer = null;
-  let armAngle = -0.65;
-  let armDirection = 1;
-  let currentPieceType = 'T';
-  let screenShake = 0;
-  let keysDown = new Set();
+  let grid = [], players = [], particles = [], fallingBlocks = [];
+  let running = false, currentPlayerIndex = 0, turnTimeLeft = CONFIG.turnTime;
+  let turnTimer = null, armAngle = -0.65, armDirection = 1, currentPieceType = 'T';
+  let screenShake = 0, keysDown = new Set();
 
   function showScreen(name) {
-    Object.values(screens).forEach(el => el.classList.remove('screen--active'));
-    screens[name].classList.add('screen--active');
+    Object.values(screens).forEach(s => s.classList.remove('active'));
+    screens[name].classList.add('active');
   }
 
-  function getCurrentPlayer() {
-    return players[currentPlayerIndex];
-  }
+  function getCurrentPlayer() { return players[currentPlayerIndex]; }
 
   function updateHUD() {
     hudEl.innerHTML = '';
-    players.forEach((player, index) => {
+    players.forEach((p, i) => {
       const div = document.createElement('div');
-      div.className = `hud-player ${!player.alive ? 'hud-player--out' : ''}`;
-      let heartsHTML = '';
-      for (let i = 0; i < CONFIG.maxLives; i++) {
-        const lost = i >= player.lives;
-        heartsHTML += `<div class="life ${lost ? 'life--lost' : ''}"></div>`;
-      }
-      div.innerHTML = `
-        <span class="dot" style="background:${player.color}"></span>
-        <span><strong>${player.name}</strong></span>
-        <div class="lives">${heartsHTML}</div>
-      `;
-      if (index === currentPlayerIndex && player.alive) {
-        div.style.boxShadow = `0 0 0 4px ${player.color}`;
-      }
+      div.className = `hud-player ${!p.alive ? 'out' : ''}`;
+      let hearts = '';
+      for (let j = 0; j < CONFIG.maxLives; j++) hearts += `<div class="life ${j >= p.lives ? 'lost' : ''}"></div>`;
+      div.innerHTML = `<span class="dot" style="background:${p.color}"></span><span><strong>${p.name}</strong></span><div class="lives">${hearts}</div>`;
+      if (i === currentPlayerIndex && p.alive) div.style.boxShadow = `0 0 0 4px ${p.color}`;
       hudEl.appendChild(div);
     });
   }
 
-  function updateCurrentTurnUI() {
+  function updateTurnUI() {
     const p = getCurrentPlayer();
-    if (currentTurnEl) {
-      currentTurnEl.innerHTML = `<span style="color:${p.color}">●</span> Turno de <strong>${p.name}</strong>`;
-      currentTurnEl.style.borderColor = p.color;
-    }
+    if (currentTurnEl) currentTurnEl.innerHTML = `<span style="color:${p.color}">●</span> Turno de <strong>${p.name}</strong>`;
   }
 
-  function updateCurrentPieceUI() {
-    if (currentPieceEl) currentPieceEl.innerHTML = `<span style="font-size:2.5rem; font-weight:900; color:#f59e0b;">${currentPieceType}</span>`;
+  function updatePieceUI() {
+    if (currentPieceEl) currentPieceEl.innerHTML = `<span style="font-size:2.4rem; font-weight:900; color:#f59e0b;">${currentPieceType}</span>`;
   }
 
   function createGrid() {
@@ -94,13 +66,9 @@
     for (let r = 0; r < CONFIG.rows; r++) {
       grid[r] = [];
       for (let c = 0; c < CONFIG.cols; c++) {
-        const width = 2 * r + 1;
-        const startCol = Math.floor((CONFIG.cols - width) / 2);
-        if (c >= startCol && c < startCol + width) {
-          grid[r][c] = { state: 'solid', height: 0, placedBy: null };
-        } else {
-          grid[r][c] = null;
-        }
+        const w = 2 * r + 1;
+        const start = Math.floor((CONFIG.cols - w) / 2);
+        grid[r][c] = (c >= start && c < start + w) ? { state: 'solid', height: 0 } : null;
       }
     }
   }
@@ -108,83 +76,48 @@
   function initPlayers(count) {
     players = CONFIG.players.slice(0, count).map((cfg, i) => {
       const bottom = CONFIG.rows - 1;
-      const width = 2 * bottom + 1;
-      const startCol = Math.floor((CONFIG.cols - width) / 2);
-      const spawnCol = startCol + Math.floor(width / (count + 1)) * (i + 1);
-      return {
-        ...cfg,
-        row: bottom,
-        col: spawnCol,
-        lives: CONFIG.maxLives,
-        alive: true,
-        score: 0
-      };
+      const w = 2 * bottom + 1;
+      const start = Math.floor((CONFIG.cols - w) / 2);
+      return { ...cfg, row: bottom, col: start + Math.floor(w / (count + 1)) * (i + 1), lives: CONFIG.maxLives, alive: true, score: 0 };
     });
   }
 
-  function getBlockAt(row, col) {
-    if (row < 0 || row >= CONFIG.rows || col < 0 || col >= CONFIG.cols) return null;
-    return grid[row] ? grid[row][col] : null;
+  function getBlock(row, col) {
+    return (row >= 0 && row < CONFIG.rows && col >= 0 && col < CONFIG.cols) ? grid[row][col] : null;
   }
 
-  function checkAndMakeBlocksFall() {
+  function makeBlocksFall() {
     let fell = false;
     for (let r = CONFIG.rows - 2; r >= 0; r--) {
       for (let c = 0; c < CONFIG.cols; c++) {
-        const block = grid[r][c];
-        if (!block || block.state !== 'solid') continue;
-        const below = getBlockAt(r + 1, c);
-        if (!below || below.state !== 'solid') {
-          fallingBlocks.push({
-            row: r, col: c,
-            x: 55 + c * CONFIG.blockSize,
-            y: 145 + r * (CONFIG.blockSize * 0.88),
-            vy: 80 + Math.random() * 60,
-            life: 1.2,
-            color: block.height > 0 ? '#ec4899' : '#854d0e'
-          });
+        const b = grid[r][c];
+        if (b && b.state === 'solid' && !getBlock(r+1, c)) {
+          fallingBlocks.push({ x: 55 + c * CONFIG.blockSize, y: 145 + r * 42, vy: 90, life: 1.1, color: b.height > 0 ? '#ec4899' : '#854d0e' });
           grid[r][c] = null;
           fell = true;
         }
       }
     }
-    if (fell && screenShake < 8) screenShake = 12;
-    return fell;
+    if (fell) screenShake = 10;
   }
 
-  function updateFallingBlocks(dt) {
-    fallingBlocks = fallingBlocks.filter(block => {
-      block.y += block.vy * dt;
-      block.vy += CONFIG.gravity * dt;
-      block.life -= dt;
-      if (block.y > canvas.height - 80 || block.life <= 0) {
-        spawnParticles(block.x + 20, block.y + 20, block.color, 8);
-        return false;
-      }
+  function updateFalling(dt) {
+    fallingBlocks = fallingBlocks.filter(b => {
+      b.y += b.vy * dt; b.vy += CONFIG.gravity * dt; b.life -= dt;
+      if (b.y > 500 || b.life <= 0) { spawnParticles(b.x + 18, b.y + 15, b.color, 6); return false; }
       return true;
     });
   }
 
-  function checkPlayersFall() {
-    players.forEach(player => {
-      if (!player.alive) return;
-      const block = getBlockAt(player.row, player.col);
-      if (!block || block.state !== 'solid') {
-        player.lives--;
-        spawnParticles(55 + player.col * CONFIG.blockSize + 24, 145 + player.row * (CONFIG.blockSize * 0.88) + 30, player.color, 18);
-        if (player.lives <= 0) {
-          player.alive = false;
-          checkWin();
-        } else {
-          for (let r = CONFIG.rows - 1; r >= 0; r--) {
-            for (let c = 0; c < CONFIG.cols; c++) {
-              if (getBlockAt(r, c)) {
-                player.row = r;
-                player.col = c;
-                return;
-              }
-            }
-          }
+  function checkPlayerFall() {
+    players.forEach(p => {
+      if (!p.alive) return;
+      if (!getBlock(p.row, p.col)) {
+        p.lives--;
+        spawnParticles(55 + p.col * CONFIG.blockSize + 24, 145 + p.row * 42 + 20, p.color, 15);
+        if (p.lives <= 0) { p.alive = false; checkWin(); }
+        else {
+          for (let r = CONFIG.rows-1; r >= 0; r--) for (let c = 0; c < CONFIG.cols; c++) if (getBlock(r,c)) { p.row = r; p.col = c; return; }
         }
       }
     });
@@ -192,17 +125,15 @@
 
   function checkWin() {
     const alive = players.filter(p => p.alive);
-    if (alive.length <= 1 && running) {
+    if (alive.length <= 1) {
       running = false;
       if (turnTimer) clearInterval(turnTimer);
       setTimeout(() => {
         showScreen('result');
-        const winner = alive[0];
-        if (winner) {
-          resultTitle.textContent = '¡Victoria!';
-          resultMessage.innerHTML = `<strong style="color:${winner.color}">${winner.name}</strong> es el último en pie.`;
-        }
-      }, 1200);
+        const w = alive[0];
+        document.getElementById('result-title').textContent = w ? '¡Victoria!' : 'Empate';
+        document.getElementById('result-message').innerHTML = w ? `${w.name} es el último en pie.` : 'Todos cayeron.';
+      }, 1000);
     }
   }
 
@@ -215,148 +146,95 @@
 
   function dropPiece() {
     if (!running) return;
-    const player = getCurrentPlayer();
-    if (!player.alive) return;
-
+    const p = getCurrentPlayer(); if (!p.alive) return;
     const dropX = 140 + Math.sin(armAngle) * 215;
-    const col = Math.max(0, Math.min(CONFIG.cols - 1, Math.floor((dropX - 55) / CONFIG.blockSize)));
+    const col = Math.max(0, Math.min(CONFIG.cols-1, Math.floor((dropX-55)/CONFIG.blockSize)));
 
-    let hit = false;
-    for (let r = CONFIG.rows - 1; r >= 0; r--) {
-      const block = grid[r][col];
-      if (block && block.state === 'solid') {
-        block.height = (block.height || 0) + 1;
-        block.placedBy = player.id;
-
-        if (Math.random() < CONFIG.instabilityChance) {
-          const neighbors = [getBlockAt(r, col-1), getBlockAt(r, col+1), getBlockAt(r+1, col)];
-          neighbors.forEach(nb => { if (nb && nb.state === 'solid' && Math.random() < 0.6) nb.height = (nb.height || 0) + 1; });
-        }
-
-        spawnParticles(dropX, 145 + r * (CONFIG.blockSize * 0.88) + 20, player.color, 12);
-        if (screenShake < 6) screenShake = 9;
-        hit = true;
-        break;
+    for (let r = CONFIG.rows-1; r >= 0; r--) {
+      if (grid[r][col] && grid[r][col].state === 'solid') {
+        grid[r][col].height = (grid[r][col].height || 0) + 1;
+        spawnParticles(dropX, 145 + r * 42 + 15, p.color, 10);
+        if (Math.random() < 0.4) makeBlocksFall();
+        screenShake = 8;
+        setTimeout(() => { if (running) { makeBlocksFall(); checkPlayerFall(); updateHUD(); nextTurn(); } }, 400);
+        return;
       }
-    }
-
-    if (hit) {
-      setTimeout(() => {
-        if (running) {
-          checkAndMakeBlocksFall();
-          checkPlayersFall();
-          updateHUD();
-          nextTurn();
-        }
-      }, 420);
     }
   }
 
   function nextTurn() {
-    if (!running) return;
     let next = (currentPlayerIndex + 1) % players.length;
     let tries = 0;
     while (!players[next].alive && tries < players.length) { next = (next + 1) % players.length; tries++; }
-    if (tries >= players.length) { checkWin(); return; }
+    if (tries >= players.length) return checkWin();
 
     currentPlayerIndex = next;
     turnTimeLeft = CONFIG.turnTime;
-    currentPieceType = CONFIG.pieceTypes[Math.floor(Math.random() * CONFIG.pieceTypes.length)];
-    armAngle = -0.65;
-    armDirection = 1;
-    updateHUD();
-    updateCurrentTurnUI();
-    updateCurrentPieceUI();
+    currentPieceType = CONFIG.pieceTypes[Math.floor(Math.random() * 5)];
+    armAngle = -0.65; armDirection = 1;
+    updateHUD(); updateTurnUI(); updatePieceUI();
   }
 
   function spawnParticles(x, y, color, count) {
-    for (let i = 0; i < count; i++) {
-      particles.push({ x, y, vx: (Math.random()-0.5)*170, vy: (Math.random()-0.5)*140-40, life: 0.6 + Math.random()*0.5, color, size: 3 + Math.random()*4 });
-    }
+    for (let i = 0; i < count; i++) particles.push({ x, y, vx: (Math.random()-0.5)*160, vy: (Math.random()-0.5)*130-30, life: 0.55 + Math.random()*0.4, color, size: 3 + Math.random()*3 });
   }
 
   function updateParticles(dt) {
-    particles = particles.filter(p => { p.life -= dt; p.x += p.vx * dt; p.y += p.vy * dt; p.vy += 380 * dt; return p.life > 0; });
-  }
-
-  function drawBackground() {
-    const grd = ctx.createLinearGradient(0, 0, 0, canvas.height);
-    grd.addColorStop(0, '#1e2937'); grd.addColorStop(0.25, '#334155');
-    grd.addColorStop(0.55, '#854d0e'); grd.addColorStop(1, '#f59e0b');
-    ctx.fillStyle = grd; ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    ctx.fillStyle = '#fbbf24';
-    ctx.beginPath(); ctx.arc(canvas.width * 0.75, 95, 55, 0, Math.PI * 2); ctx.fill();
-
-    ctx.fillStyle = 'rgba(245, 158, 11, 0.25)';
-    for (let i = 0; i < 5; i++) {
-      const x = (i * 160 + 40) % canvas.width;
-      ctx.beginPath(); ctx.ellipse(x, 70 + (i%2)*25, 55, 22, 0, 0, Math.PI * 2); ctx.fill();
-    }
-  }
-
-  function drawPyramid() {
-    const startY = 145; const bs = CONFIG.blockSize;
-    for (let r = 0; r < CONFIG.rows; r++) {
-      const width = 2 * r + 1; const startCol = Math.floor((CONFIG.cols - width) / 2);
-      for (let c = startCol; c < startCol + width; c++) {
-        const block = grid[r][c]; if (!block) continue;
-        const x = 55 + c * bs; const y = startY + r * (bs * 0.88);
-        let fill = block.height > 0 ? '#b45309' : '#854d0e';
-        ctx.fillStyle = fill; ctx.strokeStyle = '#451a03'; ctx.lineWidth = 3;
-        ctx.fillRect(x, y, bs-2, bs-2); ctx.strokeRect(x, y, bs-2, bs-2);
-        ctx.fillStyle = '#fcd34d'; ctx.fillRect(x + 3, y + 3, bs - 8, 6);
-        if (block.height > 0) { ctx.fillStyle = '#fefce8'; ctx.font = 'bold 15px sans-serif'; ctx.textAlign = 'center'; ctx.fillText('𓂀', x + bs/2, y + bs/2 + 5); }
-      }
-    }
-  }
-
-  function drawArm() {
-    const cx = 135; const baseY = 155; const len = 225;
-    ctx.save(); ctx.translate(cx, baseY); ctx.rotate(armAngle);
-    ctx.strokeStyle = '#451a03'; ctx.lineWidth = 16; ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(0,len); ctx.stroke();
-    ctx.strokeStyle = '#fcd34d'; ctx.lineWidth = 8;
-    for (let i=1; i<6; i++) { const yy = (len/6)*i; ctx.beginPath(); ctx.moveTo(-6,yy); ctx.lineTo(6,yy); ctx.stroke(); }
-    ctx.strokeStyle = '#f59e0b'; ctx.lineWidth = 6; ctx.beginPath(); ctx.moveTo(-20,len-5); ctx.lineTo(0,len+30); ctx.lineTo(20,len-5); ctx.stroke();
-    ctx.fillStyle = '#f97316'; ctx.beginPath(); ctx.arc(0, len+33, 12, 0, Math.PI*2); ctx.fill();
-    ctx.restore();
-    ctx.fillStyle = '#451a03'; ctx.fillRect(cx-25, baseY-28, 50, 38);
-  }
-
-  function drawPlayers() {
-    players.forEach(player => {
-      if (!player.alive) return;
-      const x = 55 + player.col * CONFIG.blockSize + 24;
-      const y = 145 + player.row * (CONFIG.blockSize * 0.88) - 8;
-      ctx.fillStyle = player.color; ctx.beginPath(); ctx.arc(x, y, 14, 0, Math.PI*2); ctx.fill();
-      ctx.strokeStyle = '#451a03'; ctx.lineWidth = 3; ctx.stroke();
-      ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(x-5, y-3, 4, 0, Math.PI*2); ctx.arc(x+5, y-3, 4, 0, Math.PI*2); ctx.fill();
-    });
-  }
-
-  function drawFallingBlocks() {
-    fallingBlocks.forEach(b => { ctx.fillStyle = b.color; ctx.fillRect(b.x, b.y, 38, 34); ctx.strokeStyle = '#451a03'; ctx.lineWidth = 2; ctx.strokeRect(b.x, b.y, 38, 34); });
-  }
-
-  function drawParticles() {
-    particles.forEach(p => { ctx.globalAlpha = Math.max(0, p.life); ctx.fillStyle = p.color; ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI*2); ctx.fill(); });
-    ctx.globalAlpha = 1;
+    particles = particles.filter(p => { p.life -= dt; p.x += p.vx*dt; p.y += p.vy*dt; p.vy += 360*dt; return p.life > 0; });
   }
 
   function draw() {
     ctx.save();
-    if (screenShake > 0) { ctx.translate(Math.random()*screenShake - screenShake/2, Math.random()*screenShake - screenShake/2); screenShake *= 0.85; if (screenShake < 0.5) screenShake = 0; }
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    drawBackground(); drawPyramid(); drawArm(); drawPlayers(); drawFallingBlocks(); drawParticles();
+    if (screenShake > 0) { ctx.translate((Math.random()-0.5)*screenShake, (Math.random()-0.5)*screenShake); screenShake *= 0.8; }
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+
+    // Fondo desierto
+    const g = ctx.createLinearGradient(0,0,0,canvas.height);
+    g.addColorStop(0,'#1e2937'); g.addColorStop(0.3,'#334155'); g.addColorStop(0.6,'#854d0e'); g.addColorStop(1,'#f59e0b');
+    ctx.fillStyle = g; ctx.fillRect(0,0,canvas.width,canvas.height);
+
+    // Pirámide
+    const bs = CONFIG.blockSize;
+    for (let r = 0; r < CONFIG.rows; r++) {
+      const w = 2*r + 1; const start = Math.floor((CONFIG.cols-w)/2);
+      for (let c = start; c < start+w; c++) {
+        const b = grid[r][c]; if (!b) continue;
+        const x = 55 + c*bs, y = 145 + r*42;
+        ctx.fillStyle = b.height > 0 ? '#b45309' : '#854d0e';
+        ctx.fillRect(x, y, bs-2, bs-2);
+        ctx.strokeStyle = '#451a03'; ctx.lineWidth = 2; ctx.strokeRect(x, y, bs-2, bs-2);
+        if (b.height > 0) { ctx.fillStyle = '#fefce8'; ctx.font = 'bold 14px sans-serif'; ctx.fillText('𓂀', x + bs/2, y + bs/2 + 4); }
+      }
+    }
+
+    // Brazo
+    ctx.save(); ctx.translate(135, 155); ctx.rotate(armAngle);
+    ctx.strokeStyle = '#451a03'; ctx.lineWidth = 14; ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(0,210); ctx.stroke();
+    ctx.strokeStyle = '#fcd34d'; ctx.lineWidth = 7;
+    for (let i=1; i<5; i++) { const yy = 210/5 * i; ctx.beginPath(); ctx.moveTo(-5,yy); ctx.lineTo(5,yy); ctx.stroke(); }
+    ctx.strokeStyle = '#f59e0b'; ctx.lineWidth = 5; ctx.beginPath(); ctx.moveTo(-18,205); ctx.lineTo(0,235); ctx.lineTo(18,205); ctx.stroke();
+    ctx.fillStyle = '#f97316'; ctx.beginPath(); ctx.arc(0,238,10,0,Math.PI*2); ctx.fill();
+    ctx.restore();
+
+    // Jugadores
+    players.forEach(p => {
+      if (!p.alive) return;
+      const x = 55 + p.col * bs + 24, y = 145 + p.row * 42 - 6;
+      ctx.fillStyle = p.color; ctx.beginPath(); ctx.arc(x, y, 13, 0, Math.PI*2); ctx.fill();
+      ctx.strokeStyle = '#451a03'; ctx.lineWidth = 2; ctx.stroke();
+    });
+
+    // Partículas y bloques cayendo
+    particles.forEach(p => { ctx.globalAlpha = p.life; ctx.fillStyle = p.color; ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI*2); ctx.fill(); });
+    ctx.globalAlpha = 1;
+    fallingBlocks.forEach(b => { ctx.fillStyle = b.color; ctx.fillRect(b.x, b.y, 36, 32); });
+
     ctx.restore();
   }
 
-  let lastTime = performance.now();
-
-  function gameLoop(now = performance.now()) {
+  function gameLoop() {
     if (!running) return;
-    const dt = Math.min((now - lastTime) / 1000, 0.12); lastTime = now;
-    updateArm(); updateFallingBlocks(dt); updateParticles(dt); draw();
+    updateArm(); updateFalling(0.016); updateParticles(0.016); draw();
     requestAnimationFrame(gameLoop);
   }
 
@@ -370,78 +248,61 @@
   }
 
   function startCountdown() {
-    let count = 3;
-    const countdownInterval = setInterval(() => {
-      ctx.fillStyle = 'rgba(17, 24, 39, 0.85)';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      ctx.fillStyle = '#fcd34d';
-      ctx.font = 'bold 140px Orbitron';
-      ctx.textAlign = 'center';
-
-      if (count > 0) {
-        ctx.fillText(count, canvas.width/2, canvas.height/2 + 50);
-      } else {
-        clearInterval(countdownInterval);
-        ctx.fillStyle = '#f59e0b';
-        ctx.font = 'bold 90px Orbitron';
-        ctx.fillText('START', canvas.width/2, canvas.height/2 + 40);
-        setTimeout(() => {
-          startTurnTimer();
-          gameLoop();
-        }, 800);
-      }
-      count--;
-    }, 850);
+    let c = 3;
+    const iv = setInterval(() => {
+      ctx.fillStyle = 'rgba(17,24,39,0.9)'; ctx.fillRect(0,0,canvas.width,canvas.height);
+      ctx.fillStyle = '#fcd34d'; ctx.font = 'bold 120px Orbitron'; ctx.textAlign = 'center';
+      if (c > 0) ctx.fillText(c, canvas.width/2, canvas.height/2 + 40);
+      else { clearInterval(iv); ctx.fillText('START', canvas.width/2, canvas.height/2 + 40); setTimeout(() => { startTurnTimer(); gameLoop(); }, 700); }
+      c--;
+    }, 800);
   }
 
-  function startGame() {
+  function startGameFlow() {
     createGrid();
-    initPlayers(3); // valor por defecto, se puede mejorar
+    initPlayers(3);
     particles = []; fallingBlocks = [];
-    currentPlayerIndex = 0; turnTimeLeft = CONFIG.turnTime;
-    armAngle = -0.65; armDirection = 1; currentPieceType = 'T'; screenShake = 0;
+    currentPlayerIndex = 0; turnTimeLeft = CONFIG.turnTime; armAngle = -0.65;
+    currentPieceType = 'T'; screenShake = 0; running = false;
 
     showScreen('loading');
 
     setTimeout(() => {
       showScreen('game');
-      updateHUD(); updateCurrentTurnUI(); updateCurrentPieceUI();
+      updateHUD(); updateTurnUI(); updatePieceUI();
       if (timerEl) timerEl.textContent = turnTimeLeft;
       startCountdown();
       running = true;
-    }, 1800);
+    }, 1600);
   }
 
-  function restartGame() {
+  function restart() {
     if (turnTimer) clearInterval(turnTimer);
     showScreen('menu'); running = false;
   }
 
+  // Eventos
   document.querySelectorAll('.player-selector button').forEach(btn => {
     btn.addEventListener('click', () => {
-      document.querySelectorAll('.player-selector button').forEach(b => b.classList.remove('btn--selected'));
-      btn.classList.add('btn--selected');
+      document.querySelectorAll('.player-selector button').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
     });
   });
 
-  document.getElementById('start-btn').addEventListener('click', startGame);
-  document.getElementById('restart-btn').addEventListener('click', restartGame);
+  document.getElementById('start-btn').addEventListener('click', startGameFlow);
+  document.getElementById('restart-btn').addEventListener('click', restart);
 
   window.addEventListener('keydown', e => {
-    keysDown.add(e.code);
     if (!running) return;
     const p = getCurrentPlayer(); if (!p || !p.alive) return;
-    if (e.code === p.keys.left) armAngle -= 0.15;
-    if (e.code === p.keys.right) armAngle += 0.15;
+    if (e.code === p.keys.left) armAngle -= 0.14;
+    if (e.code === p.keys.right) armAngle += 0.14;
     if (e.code === p.keys.action || e.code === 'Space') { e.preventDefault(); dropPiece(); }
   });
 
-  window.addEventListener('keyup', e => keysDown.delete(e.code));
-
   function init() {
     canvas.width = 860; canvas.height = 620;
-    console.log('%c[Prickly Pyramids] Pantalla de carga + Countdown 3-2-1-START implementado.', 'color:#f59e0b');
+    console.log('%c[Prickly Pyramids] Versión limpia y funcional lista.', 'color:#f59e0b');
   }
 
   init();
