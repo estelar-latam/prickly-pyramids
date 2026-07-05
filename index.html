@@ -13,15 +13,14 @@
   <div class="app">
     <header class="header">
       <h1 class="logo">Prickly Pyramids</h1>
-      <p class="tagline">¡Construye con estrategia. Sobrevive al colapso.</p>
+      <p class="tagline">¡Causa el colapso. Sobrevive al vacío.</p>
     </header>
 
-    <!-- MENÚ -->
     <section id="menu-screen" class="screen active">
       <div class="panel">
         <h2>Configuración</h2>
         <div class="field">
-          <label>Número de Jugadores</label>
+          <label>Jugadores</label>
           <div class="player-selector">
             <button class="btn btn-ghost" data-players="2">2</button>
             <button class="btn btn-ghost selected" data-players="3">3</button>
@@ -32,43 +31,36 @@
       </div>
     </section>
 
-    <!-- CARGA -->
     <section id="loading-screen" class="screen loading-full">
       <div class="loading-center">
         <div class="spinner"></div>
-        <p class="loading-text">Preparando el desierto...</p>
+        <p class="loading-text">Preparando el colapso...</p>
       </div>
     </section>
 
-    <!-- JUEGO -->
     <section id="game-screen" class="screen">
       <div class="game-layout">
         <div class="hud" id="hud"></div>
-        
         <div class="game-main">
           <div class="canvas-container">
             <canvas id="game-canvas" width="860" height="620"></canvas>
           </div>
-          
           <div class="side-panel">
-            <div class="info-box timer-box">
-              <span>Tiempo Restante</span>
+            <div class="info-box">
+              <span>Tiempo</span>
               <div id="timer" class="timer-value">25</div>
             </div>
-            
             <div class="info-box turn-box">
               <div id="current-turn"></div>
             </div>
-            
             <div class="info-box piece-box">
-              <span>Pieza Actual</span>
+              <span>Pieza</span>
               <div id="current-piece"></div>
             </div>
           </div>
         </div>
       </section>
 
-    <!-- RESULTADO -->
     <section id="result-screen" class="screen">
       <div class="panel result-panel">
         <h2 id="result-title"></h2>
