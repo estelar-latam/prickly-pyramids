@@ -17,9 +17,9 @@
     </header>
 
     <main class="main">
-      <!-- Menú -->
+      <!-- Menú Principal -->
       <section id="menu-screen" class="screen screen--active">
-        <div class="panel">
+        <div class="panel menu-panel">
           <h2>Configuración</h2>
           <div class="field">
             <label>Jugadores</label>
@@ -29,59 +29,56 @@
               <button type="button" class="btn btn--ghost" data-players="4">4</button>
             </div>
           </div>
-          <div class="controls-preview" id="controls-preview"></div>
           <button type="button" id="start-btn" class="btn btn--primary">Comenzar Partida</button>
         </div>
       </section>
 
       <!-- Pantalla de Carga -->
       <section id="loading-screen" class="screen">
-        <div class="loading-container">
-          <div class="loading-spinner"></div>
-          <p class="loading-text">Cargando partida...</p>
+        <div class="loading-overlay">
+          <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <p class="loading-text">Cargando partida...</p>
+          </div>
         </div>
       </section>
 
-      <!-- Juego -->
+      <!-- Pantalla del Juego -->
       <section id="game-screen" class="screen">
-        <div class="hud" id="hud"></div>
-        
-        <div class="game-container">
-          <div class="canvas-wrap">
-            <canvas id="game-canvas" width="860" height="620"></canvas>
-          </div>
+        <div class="game-layout">
+          <div class="hud" id="hud"></div>
           
-          <div class="side-panel">
-            <div class="timer-box">
-              <span>Tiempo Restante</span>
-              <div id="timer" class="timer">25</div>
+          <div class="game-main">
+            <div class="canvas-wrap">
+              <canvas id="game-canvas" width="860" height="620"></canvas>
             </div>
             
-            <div class="turn-info">
-              <div id="current-turn" class="current-turn"></div>
-            </div>
-            
-            <div class="pieces-info">
-              <h4>Pieza Actual</h4>
-              <div id="current-piece" class="current-piece"></div>
+            <div class="side-panel">
+              <div class="timer-box">
+                <span>Tiempo Restante</span>
+                <div id="timer" class="timer">25</div>
+              </div>
+              <div class="turn-info">
+                <div id="current-turn" class="current-turn"></div>
+              </div>
+              <div class="pieces-info">
+                <h4>Pieza Actual</h4>
+                <div id="current-piece" class="current-piece"></div>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      <!-- Resultado -->
+      <!-- Pantalla de Resultado -->
       <section id="result-screen" class="screen">
-        <div class="panel panel--result">
+        <div class="panel result-panel">
           <h2 id="result-title">¡Victoria!</h2>
           <p id="result-message"></p>
           <button type="button" id="restart-btn" class="btn btn--primary">Jugar de nuevo</button>
         </div>
       </section>
     </main>
-
-    <footer class="footer">
-      <span>Multijugador local · Turnos · HTML5 Canvas</span>
-    </footer>
   </div>
 
   <script src="game.js"></script>
