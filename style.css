@@ -308,3 +308,145 @@ body {
     padding: 0.35rem 0.65rem;
   }
 }
+:root {
+  --bg-deep: #0a0e17;
+  --bg-panel: #121a2b;
+  --accent: #00d4ff;
+  --accent-warm: #ff6b35;
+  --text: #e8edf5;
+  --text-muted: #8b9cb8;
+  --border: rgba(0, 212, 255, 0.2);
+  --shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
+  --radius: 12px;
+  
+  --sky-green: #4ade80;
+  --desert-orange: #fb923c;
+  --pyramid-brown: #92400e;
+  --piece-pink: #ec4899;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  min-height: 100vh;
+  font-family: 'Rajdhani', system-ui, sans-serif;
+  background: linear-gradient(180deg, #4ade80 0%, #fb923c 100%);
+  color: #451a03;
+  line-height: 1.5;
+}
+
+.app {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1.5rem 1.25rem 2rem;
+}
+
+.header { text-align: center; margin-bottom: 1.5rem; }
+
+.logo {
+  font-family: 'Orbitron', sans-serif;
+  font-size: clamp(1.8rem, 5vw, 2.8rem);
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  background: linear-gradient(135deg, #92400e 0%, #fb923c 50%, #ec4899 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.tagline {
+  color: #78350f;
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.panel {
+  background: rgba(255,255,255,0.95);
+  border: 3px solid #92400e;
+  border-radius: 16px;
+  padding: 2rem 2.5rem;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  color: #451a03;
+}
+
+.btn {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 700;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  padding: 0.75rem 1.25rem;
+  transition: all 0.15s;
+}
+
+.btn--ghost {
+  background: #fefce8;
+  color: #451a03;
+  border: 2px solid #92400e;
+}
+
+.btn--ghost.btn--selected {
+  background: #fb923c;
+  color: white;
+  border-color: #92400e;
+}
+
+.btn--primary {
+  background: linear-gradient(135deg, #92400e 0%, #fb923c 100%);
+  color: white;
+  font-size: 1.2rem;
+  border: 3px solid #451a03;
+}
+
+.game-container {
+  display: flex;
+  gap: 1.5rem;
+  justify-content: center;
+  width: 100%;
+}
+
+.canvas-wrap {
+  background: #fefce8;
+  border: 6px solid #92400e;
+  border-radius: 16px;
+  padding: 12px;
+  box-shadow: 0 15px 35px rgba(0,0,0,0.35);
+}
+
+.side-panel {
+  width: 220px;
+  background: rgba(255,255,255,0.95);
+  border: 4px solid #92400e;
+  border-radius: 16px;
+  padding: 1.25rem;
+  color: #451a03;
+}
+
+.timer {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 3rem;
+  font-weight: 900;
+  color: #ec4899;
+}
+
+.current-turn {
+  background: #fb923c;
+  color: white;
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  font-weight: 800;
+  text-align: center;
+  border: 3px solid #451a03;
+}
+
+.hint {
+  margin-top: 1rem;
+  font-size: 1rem;
+  color: #451a03;
+  text-align: center;
+  font-weight: 700;
+  background: rgba(255,255,255,0.7);
+  padding: 0.5rem 1.5rem;
+  border-radius: 999px;
+  border: 2px solid #92400e;
+}
