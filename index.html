@@ -33,34 +33,32 @@
         </div>
       </section>
 
-      <!-- CARGA -->
-      <section id="loading-screen" class="screen">
-        <div class="loading-box">
+      <!-- CARGA (pantalla completa temporal) -->
+      <section id="loading-screen" class="screen loading-full">
+        <div class="loading-center">
           <div class="spinner"></div>
-          <p>Cargando partida...</p>
+          <p class="loading-text">Cargando partida...</p>
         </div>
       </section>
 
       <!-- JUEGO -->
       <section id="game-screen" class="screen">
-        <div class="game-wrapper">
+        <div class="game-container">
           <div class="hud" id="hud"></div>
           
-          <div class="game-content">
-            <div class="canvas-container">
+          <div class="game-main">
+            <div class="canvas-box">
               <canvas id="game-canvas" width="860" height="620"></canvas>
             </div>
             
             <div class="side-panel">
-              <div class="timer-container">
-                <span>Tiempo</span>
-                <div id="timer" class="timer-value">25</div>
+              <div class="timer-box">
+                <span>Tiempo Restante</span>
+                <div id="timer" class="timer">25</div>
               </div>
-              <div class="turn-container">
-                <div id="current-turn"></div>
-              </div>
-              <div class="piece-container">
-                <span>Pieza</span>
+              <div id="current-turn" class="turn-box"></div>
+              <div class="piece-box">
+                <span>Pieza Actual</span>
                 <div id="current-piece"></div>
               </div>
             </div>
