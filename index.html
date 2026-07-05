@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Prickly Pyramids - Turnos</title>
+  <title>Prickly Pyramids</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
@@ -17,12 +17,11 @@
     </header>
 
     <main class="main">
-      <!-- Pantalla de Menú -->
       <section id="menu-screen" class="screen screen--active">
         <div class="panel">
           <h2>Configuración</h2>
           <div class="field">
-            <label for="player-count">Jugadores</label>
+            <label>Jugadores</label>
             <div class="player-selector">
               <button type="button" class="btn btn--ghost" data-players="2">2</button>
               <button type="button" class="btn btn--ghost btn--selected" data-players="3">3</button>
@@ -34,19 +33,18 @@
         </div>
       </section>
 
-      <!-- Pantalla de Juego -->
       <section id="game-screen" class="screen">
         <div class="hud" id="hud"></div>
         
         <div class="game-container">
           <div class="canvas-wrap">
-            <canvas id="game-canvas" width="780" height="580"></canvas>
+            <canvas id="game-canvas" width="860" height="620"></canvas>
           </div>
           
           <div class="side-panel">
             <div class="timer-box">
               <span>Tiempo Restante</span>
-              <div id="timer" class="timer">30</div>
+              <div id="timer" class="timer">25</div>
             </div>
             
             <div class="turn-info">
@@ -59,11 +57,8 @@
             </div>
           </div>
         </div>
-        
-        <p class="hint">Usa ← → para mover el brazo. Pulsa ESPACIO (o tecla de acción) para soltar la pieza.</p>
       </section>
 
-      <!-- Pantalla de Resultado -->
       <section id="result-screen" class="screen">
         <div class="panel panel--result">
           <h2 id="result-title">¡Victoria!</h2>
