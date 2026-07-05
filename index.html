@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prickly Pyramids</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app">
+    <header class="header">
+      <h1 class="logo">Prickly Pyramids</h1>
+      <p class="tagline">Voltea bloques. Elimina rivales. Sé el último en pie.</p>
+    </header>
+
+    <main class="main">
+      <section id="menu-screen" class="screen screen--active">
+        <div class="panel">
+          <h2>Configuración</h2>
+          <div class="field">
+            <label for="player-count">Jugadores</label>
+            <div class="player-selector">
+              <button type="button" class="btn btn--ghost" data-players="2">2</button>
+              <button type="button" class="btn btn--ghost btn--selected" data-players="3">3</button>
+              <button type="button" class="btn btn--ghost" data-players="4">4</button>
+            </div>
+          </div>
+          <div class="controls-preview" id="controls-preview"></div>
+          <button type="button" id="start-btn" class="btn btn--primary">Jugar</button>
+        </div>
+      </section>
+
+      <section id="game-screen" class="screen">
+        <div class="hud" id="hud"></div>
+        <div class="canvas-wrap">
+          <canvas id="game-canvas"></canvas>
+        </div>
+        <p class="hint">Paso sobre un bloque para marcarlo. Un segundo paso lo voltea al vacío.</p>
+      </section>
+
+      <section id="result-screen" class="screen">
+        <div class="panel panel--result">
+          <h2 id="result-title">¡Victoria!</h2>
+          <p id="result-message"></p>
+          <button type="button" id="restart-btn" class="btn btn--primary">Jugar de nuevo</button>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <span>Multijugador local · HTML5 Canvas</span>
+    </footer>
+  </div>
+
+  <script src="game.js"></script>
+</body>
+</html>
