@@ -1,8 +1,7 @@
-/* Estilos limpios y profesionales */
+/* Estilos base */
 :root {
   --brown: #92400e;
   --orange: #fb923c;
-  --gold: #fcd34d;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -85,7 +84,7 @@ body {
   margin-top: 1rem;
 }
 
-/* Loading Screen - Pantalla completa */
+/* Loading full screen */
 .loading-full {
   position: fixed;
   top: 0;
@@ -147,7 +146,6 @@ body {
   border: 4px solid var(--brown);
   border-radius: 16px;
   padding: 1.2rem;
-  flex-shrink: 0;
 }
 
 .timer {

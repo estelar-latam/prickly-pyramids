@@ -17,7 +17,7 @@
     </header>
 
     <main class="main">
-      <!-- MENÚ -->
+      <!-- MENÚ (visible por defecto) -->
       <section id="menu-screen" class="screen active">
         <div class="panel">
           <h2>Configuración</h2>
@@ -33,7 +33,7 @@
         </div>
       </section>
 
-      <!-- CARGA (pantalla completa temporal) -->
+      <!-- CARGA -->
       <section id="loading-screen" class="screen loading-full">
         <div class="loading-center">
           <div class="spinner"></div>
@@ -45,12 +45,10 @@
       <section id="game-screen" class="screen">
         <div class="game-container">
           <div class="hud" id="hud"></div>
-          
           <div class="game-main">
             <div class="canvas-box">
               <canvas id="game-canvas" width="860" height="620"></canvas>
             </div>
-            
             <div class="side-panel">
               <div class="timer-box">
                 <span>Tiempo Restante</span>
