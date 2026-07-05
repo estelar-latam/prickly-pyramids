@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Prickly Pyramids</title>
+  <title>Prickly Pyramids - Turnos</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
@@ -13,10 +13,11 @@
   <div class="app">
     <header class="header">
       <h1 class="logo">Prickly Pyramids</h1>
-      <p class="tagline">Voltea bloques. Elimina rivales. Sé el último en pie.</p>
+      <p class="tagline">¡Construye, compite y sé el último en pie!</p>
     </header>
 
     <main class="main">
+      <!-- Pantalla de Menú -->
       <section id="menu-screen" class="screen screen--active">
         <div class="panel">
           <h2>Configuración</h2>
@@ -29,18 +30,40 @@
             </div>
           </div>
           <div class="controls-preview" id="controls-preview"></div>
-          <button type="button" id="start-btn" class="btn btn--primary">Jugar</button>
+          <button type="button" id="start-btn" class="btn btn--primary">Comenzar Partida</button>
         </div>
       </section>
 
+      <!-- Pantalla de Juego -->
       <section id="game-screen" class="screen">
         <div class="hud" id="hud"></div>
-        <div class="canvas-wrap">
-          <canvas id="game-canvas"></canvas>
+        
+        <div class="game-container">
+          <div class="canvas-wrap">
+            <canvas id="game-canvas" width="780" height="580"></canvas>
+          </div>
+          
+          <div class="side-panel">
+            <div class="timer-box">
+              <span>Tiempo Restante</span>
+              <div id="timer" class="timer">30</div>
+            </div>
+            
+            <div class="turn-info">
+              <div id="current-turn" class="current-turn"></div>
+            </div>
+            
+            <div class="pieces-info">
+              <h4>Pieza Actual</h4>
+              <div id="current-piece" class="current-piece"></div>
+            </div>
+          </div>
         </div>
-        <p class="hint">Paso sobre un bloque para marcarlo. Un segundo paso lo voltea al vacío.</p>
+        
+        <p class="hint">Usa ← → para mover el brazo. Pulsa ESPACIO (o tecla de acción) para soltar la pieza.</p>
       </section>
 
+      <!-- Pantalla de Resultado -->
       <section id="result-screen" class="screen">
         <div class="panel panel--result">
           <h2 id="result-title">¡Victoria!</h2>
@@ -51,7 +74,7 @@
     </main>
 
     <footer class="footer">
-      <span>Multijugador local · HTML5 Canvas</span>
+      <span>Multijugador local · Turnos · HTML5 Canvas</span>
     </footer>
   </div>
 
